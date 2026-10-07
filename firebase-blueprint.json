@@ -1,0 +1,214 @@
+{
+  "entities": {
+    "UserProfile": {
+      "title": "UserProfile",
+      "description": "User account profile and organization membership links",
+      "type": "object",
+      "properties": {
+        "uid": { "type": "string" },
+        "email": { "type": "string" },
+        "displayName": { "type": "string" },
+        "defaultOrgId": { "type": "string" },
+        "createdAt": { "type": "string" }
+      },
+      "required": ["uid", "email"]
+    },
+    "Organization": {
+      "title": "Organization",
+      "description": "Multi-tenant business organization entity",
+      "type": "object",
+      "properties": {
+        "id": { "type": "string" },
+        "name": { "type": "string" },
+        "businessType": { "type": "string" },
+        "state": { "type": "string" },
+        "country": { "type": "string" },
+        "employeeCountTier": { "type": "string" },
+        "payrollFrequency": { "type": "string" },
+        "financialYear": { "type": "string" },
+        "ownerId": { "type": "string" },
+        "planId": { "type": "string" },
+        "subscriptionStatus": { "type": "string" },
+        "setupStep": { "type": "string" },
+        "createdAt": { "type": "string" },
+        "updatedAt": { "type": "string" }
+      },
+      "required": ["id", "name", "ownerId", "planId", "subscriptionStatus"]
+    },
+    "OrgMember": {
+      "title": "OrgMember",
+      "description": "Membership and role in an organization",
+      "type": "object",
+      "properties": {
+        "userId": { "type": "string" },
+        "organizationId": { "type": "string" },
+        "email": { "type": "string" },
+        "role": { "type": "string", "enum": ["owner", "admin", "approver", "employee", "manager"] },
+        "employeeId": { "type": "string" },
+        "joinedAt": { "type": "string" }
+      },
+      "required": ["userId", "organizationId", "role"]
+    },
+    "Employee": {
+      "title": "Employee",
+      "description": "Indian organization employee record with statutory and salary details",
+      "type": "object",
+      "properties": {
+        "id": { "type": "string" },
+        "organizationId": { "type": "string" },
+        "employeeNumber": { "type": "string" },
+        "fullName": { "type": "string" },
+        "workEmail": { "type": "string" },
+        "phone": { "type": "string" },
+        "department": { "type": "string" },
+        "designation": { "type": "string" },
+        "dateOfJoining": { "type": "string" },
+        "status": { "type": "string", "enum": ["active", "inactive"] },
+        "employmentType": { "type": "string" },
+        "pan": { "type": "string" },
+        "bankAccountNumber": { "type": "string" },
+        "bankIfsc": { "type": "string" },
+        "bankName": { "type": "string" },
+        "pfApplicable": { "type": "string" },
+        "esiApplicable": { "type": "string" },
+        "ptApplicable": { "type": "string" },
+        "taxRegime": { "type": "string" },
+        "fixedCtcMonthly": { "type": "string" },
+        "createdAt": { "type": "string" }
+      },
+      "required": ["id", "organizationId", "employeeNumber", "fullName", "workEmail", "status"]
+    },
+    "PayrollRun": {
+      "title": "PayrollRun",
+      "description": "Monthly payroll execution record",
+      "type": "object",
+      "properties": {
+        "id": { "type": "string" },
+        "organizationId": { "type": "string" },
+        "month": { "type": "string" },
+        "year": { "type": "string" },
+        "periodName": { "type": "string" },
+        "status": { "type": "string", "enum": ["draft", "calculated", "pending_approval", "approved", "finalized"] },
+        "totalEmployees": { "type": "string" },
+        "totalGross": { "type": "string" },
+        "totalDeductions": { "type": "string" },
+        "totalNetPay": { "type": "string" },
+        "totalEmployerCost": { "type": "string" },
+        "processedBy": { "type": "string" },
+        "approvedBy": { "type": "string" },
+        "createdAt": { "type": "string" }
+      },
+      "required": ["id", "organizationId", "month", "year", "periodName", "status"]
+    },
+    "PayrollItem": {
+      "title": "PayrollItem",
+      "description": "Individual finalized employee payroll item and payslip record",
+      "type": "object",
+      "properties": {
+        "id": { "type": "string" },
+        "organizationId": { "type": "string" },
+        "payrollRunId": { "type": "string" },
+        "employeeId": { "type": "string" },
+        "employeeName": { "type": "string" },
+        "employeeNumber": { "type": "string" },
+        "grossSalary": { "type": "string" },
+        "totalDeductions": { "type": "string" },
+        "netSalary": { "type": "string" },
+        "lopDays": { "type": "string" }
+      },
+      "required": ["id", "organizationId", "payrollRunId", "employeeId", "netSalary"]
+    },
+    "LeaveRequest": {
+      "title": "LeaveRequest",
+      "description": "Employee leave request record",
+      "type": "object",
+      "properties": {
+        "id": { "type": "string" },
+        "organizationId": { "type": "string" },
+        "employeeId": { "type": "string" },
+        "employeeName": { "type": "string" },
+        "leaveType": { "type": "string" },
+        "startDate": { "type": "string" },
+        "endDate": { "type": "string" },
+        "days": { "type": "string" },
+        "reason": { "type": "string" },
+        "status": { "type": "string", "enum": ["pending", "approved", "rejected"] },
+        "createdAt": { "type": "string" }
+      },
+      "required": ["id", "organizationId", "employeeId", "leaveType", "startDate", "endDate", "status"]
+    },
+    "Reimbursement": {
+      "title": "Reimbursement",
+      "description": "Employee expense reimbursement request",
+      "type": "object",
+      "properties": {
+        "id": { "type": "string" },
+        "organizationId": { "type": "string" },
+        "employeeId": { "type": "string" },
+        "employeeName": { "type": "string" },
+        "category": { "type": "string" },
+        "amount": { "type": "string" },
+        "expenseDate": { "type": "string" },
+        "description": { "type": "string" },
+        "status": { "type": "string", "enum": ["pending", "approved", "rejected"] },
+        "createdAt": { "type": "string" }
+      },
+      "required": ["id", "organizationId", "employeeId", "amount", "status"]
+    },
+    "AuditLog": {
+      "title": "AuditLog",
+      "description": "Security and compliance audit trail entry",
+      "type": "object",
+      "properties": {
+        "id": { "type": "string" },
+        "organizationId": { "type": "string" },
+        "userId": { "type": "string" },
+        "userEmail": { "type": "string" },
+        "action": { "type": "string" },
+        "entityType": { "type": "string" },
+        "entityId": { "type": "string" },
+        "details": { "type": "string" },
+        "timestamp": { "type": "string" }
+      },
+      "required": ["id", "organizationId", "userId", "action", "timestamp"]
+    }
+  },
+  "firestore": {
+    "/users/{userId}": {
+      "schema": "UserProfile",
+      "description": "User profile metadata"
+    },
+    "/organizations/{organizationId}": {
+      "schema": "Organization",
+      "description": "Top-level tenant organization configuration"
+    },
+    "/organizations/{organizationId}/members/{userId}": {
+      "schema": "OrgMember",
+      "description": "Membership roles within an organization"
+    },
+    "/organizations/{organizationId}/employees/{employeeId}": {
+      "schema": "Employee",
+      "description": "Employees belonging to an organization"
+    },
+    "/organizations/{organizationId}/payrollRuns/{payrollRunId}": {
+      "schema": "PayrollRun",
+      "description": "Monthly payroll runs for an organization"
+    },
+    "/organizations/{organizationId}/payrollRuns/{payrollRunId}/items/{itemId}": {
+      "schema": "PayrollItem",
+      "description": "Individual employee payroll items for a payroll run"
+    },
+    "/organizations/{organizationId}/leaveRequests/{leaveRequestId}": {
+      "schema": "LeaveRequest",
+      "description": "Leave applications submitted by employees"
+    },
+    "/organizations/{organizationId}/reimbursements/{reimbursementId}": {
+      "schema": "Reimbursement",
+      "description": "Expense reimbursement claims"
+    },
+    "/organizations/{organizationId}/auditLogs/{auditId}": {
+      "schema": "AuditLog",
+      "description": "Organization activity audit logs"
+    }
+  }
+}

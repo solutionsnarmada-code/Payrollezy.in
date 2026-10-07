@@ -1,0 +1,107 @@
+rules_version = '2';
+service cloud.firestore {
+  match /databases/{database}/documents {
+
+    // Default deny catch-all
+    match /{document=**} {
+      allow read, write: if false;
+    }
+
+    function isSignedIn() {
+      return request.auth != null;
+    }
+
+    function isValidId(id) {
+      return id is string && id.size() > 0 && id.size() <= 128 && id.matches('^[a-zA-Z0-9_\\-]+$');
+    }
+
+    function isOrgMember(orgId) {
+      return isSignedIn() && exists(/databases/$(database)/documents/organizations/$(orgId)/members/$(request.auth.uid));
+    }
+
+    function getMemberData(orgId) {
+      return get(/databases/$(database)/documents/organizations/$(orgId)/members/$(request.auth.uid)).data;
+    }
+
+    function isOrgAdmin(orgId) {
+      return isOrgMember(orgId) && (getMemberData(orgId).role == 'admin' || getMemberData(orgId).role == 'owner');
+    }
+
+    function isOrgOwner(orgId) {
+      return isOrgMember(orgId) && getMemberData(orgId).role == 'owner';
+    }
+
+    function isOrgApprover(orgId) {
+      return isOrgMember(orgId) && (getMemberData(orgId).role == 'approver' || getMemberData(orgId).role == 'owner');
+    }
+
+    // User profile metadata
+    match /users/{userId} {
+      allow get: if isSignedIn() && request.auth.uid == userId;
+      allow create, update: if isSignedIn() && request.auth.uid == userId;
+      allow list: if false;
+    }
+
+    // Organizations
+    match /organizations/{orgId} {
+      allow get: if isOrgMember(orgId);
+      allow list: if isSignedIn();
+      allow create: if isSignedIn() && isValidId(orgId);
+      allow update: if isOrgAdmin(orgId);
+      allow delete: if isOrgOwner(orgId);
+
+      // Members
+      match /members/{memberId} {
+        allow get: if isOrgMember(orgId);
+        allow list: if isOrgMember(orgId);
+        allow create: if isSignedIn() && (request.auth.uid == memberId || isOrgAdmin(orgId));
+        allow update: if isOrgOwner(orgId) || (isOrgAdmin(orgId) && memberId != request.auth.uid);
+        allow delete: if isOrgOwner(orgId) && memberId != request.auth.uid;
+      }
+
+      // Employees
+      match /employees/{employeeId} {
+        allow get: if isOrgMember(orgId);
+        allow list: if isOrgMember(orgId);
+        allow create, update, delete: if isOrgAdmin(orgId);
+      }
+
+      // Payroll runs
+      match /payrollRuns/{runId} {
+        allow get, list: if isOrgMember(orgId);
+        allow create: if isOrgAdmin(orgId);
+        allow update: if isOrgAdmin(orgId) || isOrgApprover(orgId);
+        allow delete: if isOrgAdmin(orgId);
+
+        // Payroll run items (individual payslips)
+        match /items/{itemId} {
+          allow get, list: if isOrgMember(orgId);
+          allow create, update, delete: if isOrgAdmin(orgId);
+        }
+      }
+
+      // Leave Requests
+      match /leaveRequests/{leaveId} {
+        allow get, list: if isOrgMember(orgId);
+        allow create: if isOrgMember(orgId);
+        allow update: if isOrgAdmin(orgId) || isOrgMember(orgId);
+        allow delete: if isOrgAdmin(orgId);
+      }
+
+      // Reimbursements
+      match /reimbursements/{reimbId} {
+        allow get, list: if isOrgMember(orgId);
+        allow create: if isOrgMember(orgId);
+        allow update: if isOrgAdmin(orgId);
+        allow delete: if isOrgAdmin(orgId);
+      }
+
+      // Audit logs
+      match /auditLogs/{logId} {
+        allow get, list: if isOrgAdmin(orgId);
+        allow create: if isOrgMember(orgId);
+        allow update, delete: if false;
+      }
+    }
+  }
+}

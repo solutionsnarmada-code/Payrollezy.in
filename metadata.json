@@ -1,0 +1,6 @@
+{
+  "name": "payrollezy.in",
+  "description": "Calculate salaries, manage PF, ESI, PT, and TDS compliance, approve monthly payroll, and give employees self service payslips.",
+  "requestFramePermissions": [],
+  "majorCapabilities": ["MAJOR_CAPABILITY_SERVER_SIDE_GEMINI_API"]
+}
